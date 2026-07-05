@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#00B4D8">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>جداول المحاضرات © Mokhtar Gerges</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;font-family:Cairo,Arial,sans-serif}
+body{background:#020B14;color:#F0F8FF;min-height:100vh;padding-bottom:70px}
+.hdr{background:#071828;padding:10px 12px;position:sticky;top:0;z-index:50;border-bottom:1px solid #1E4060;display:flex;align-items:center;justify-content:space-between}
+.hdr-title{display:flex;align-items:center;gap:8px}
+.hdr-title img{width:28px;height:28px;border-radius:6px}
+.hdr-title h1{color:#00B4D8;font-size:15px}
+.hdr-icons{display:flex;gap:6px}
+.ic-btn{background:#0A2235;border:1px solid #1E4060;border-radius:8px;width:36px;height:36px;font-size:16px;color:#F0F8FF;cursor:pointer;display:flex;align-items:center;justify-content:center;border:none}
+.ic-btn:active{background:#1E4060}
+.srch{display:flex;align-items:center;gap:8px;background:#0A2235;border:1px solid #1E4060;border-radius:10px;padding:8px 12px;margin:8px 12px}
+.srch input{flex:1;background:transparent;border:none;color:#F0F8FF;font-size:14px;outline:none;font-family:Cairo,Arial,sans-serif;text-align:right}
+.filters{display:flex;gap:6px;padding:0 12px 8px;overflow-x:auto}
+.filters select{flex:1;min-width:80px;background:#0A2235;border:1px solid #1E4060;color:#F0F8FF;font-size:12px;padding:7px 4px;border-radius:8px;font-family:Cairo,Arial,sans-serif}
+.status-row{display:flex;align-items:center;justify-content:space-between;padding:4px 12px 6px;font-size:12px;color:#8EAFC2}
+.alrt{margin:0 12px 8px;padding:10px 14px;border-radius:10px;text-align:center;font-size:13px;font-weight:bold}
+.day-block{background:#0A2235;border:1px solid #1E4060;border-radius:12px;margin:0 12px 10px;overflow:hidden}
+.day-hdr{background:#071828;padding:10px 14px;color:#00B4D8;font-size:14px;font-weight:bold;border-bottom:1px solid #1E4060;display:flex;justify-content:space-between;align-items:center}
+.today-b{background:#E63946;color:white;padding:2px 8px;border-radius:5px;font-size:10px}
+.lec{padding:12px 14px;border-bottom:1px solid #1E4060;cursor:pointer}
+.lec:last-child{border-bottom:none}
+.lec:active{background:#0D2A40}
+.lec-top{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;align-items:center}
+.pill{display:inline-block;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:bold}
+.p-xray{background:#0A3D20;color:#2EC4B6}
+.p-lab{background:#1A2F5C;color:#48CAE4}
+.p-dent{background:#5C1A3D;color:#F48FB1}
+.p-theory{background:#1A2F5C;color:#48CAE4}
+.p-prac{background:#5C1A3D;color:#F48FB1}
+.p-combined{background:#0A3060;color:#48CAE4}
+.p-done{background:#0A3D20;color:#2EC4B6}
+.p-cancel{background:#3D0A0A;color:#E63946}
+.p-postpone{background:#1A2F5C;color:#48CAE4}
+.p-pending{background:#3D2500;color:#F4A261}
+.lec-time{display:inline-block;background:#0077A8;color:white;padding:2px 10px;border-radius:6px;font-size:11px;font-weight:bold}
+.lec-name{font-size:14px;font-weight:bold;color:#F0F8FF;margin:6px 0 3px}
+.lec-doc{font-size:12px;color:#8EAFC2}
+.lec-loc{display:inline-block;background:#3D2500;color:#F4A261;padding:1px 8px;border-radius:5px;font-size:11px;margin-top:4px}
+.attend-row{display:flex;align-items:center;justify-content:space-between;margin-top:8px;background:#071828;border-radius:8px;padding:6px 10px}
+.attend-lbl{font-size:12px;color:#8EAFC2}
+.attend-btns{display:flex;gap:6px}
+.ab-yes{background:#0A3D20;color:#2EC4B6;border:none;border-radius:6px;padding:5px 12px;font-family:Cairo,Arial,sans-serif;font-size:12px;cursor:pointer;font-weight:bold}
+.ab-no{background:#3D0A0A;color:#E63946;border:none;border-radius:6px;padding:5px 12px;font-family:Cairo,Arial,sans-serif;font-size:12px;cursor:pointer;font-weight:bold}
+.empty{padding:20px;text-align:center;color:#4a6a7a;font-size:13px}
+.fab{position:fixed;bottom:78px;left:16px;background:#0077A8;color:white;border:none;border-radius:50%;width:54px;height:54px;font-size:26px;box-shadow:0 4px 14px rgba(0,0,0,.5);z-index:60;cursor:pointer}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#071828;display:flex;border-top:1px solid #1E4060;z-index:50}
+.nb{flex:1;padding:9px 2px;text-align:center;cursor:pointer;font-size:10px;color:#8EAFC2;border:none;background:transparent;font-family:Cairo,Arial,sans-serif}
+.nb span{display:block;font-size:20px;margin-bottom:2px}
+.nb.on{color:#00B4D8}
+.sc{display:none;padding:10px 12px}
+.sc.on{display:block}
+.card{background:#0A2235;border:1px solid #1E4060;border-radius:12px;padding:14px;margin-bottom:10px}
+.card h3{color:#00B4D8;font-size:14px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #1E4060}
+.btn{display:block;width:100%;padding:13px;border:none;border-radius:10px;font-size:15px;font-family:Cairo,Arial,sans-serif;font-weight:bold;cursor:pointer;margin-bottom:8px;text-align:center;color:white}
+.btn:active{opacity:.75}
+.fg{margin-bottom:10px}
+.fg label{display:block;font-size:12px;color:#8EAFC2;margin-bottom:4px}
+.fg input,.fg select,.fg textarea{width:100%;background:#071828;border:1px solid #0077A8;border-radius:8px;padding:10px;color:#F0F8FF;font-size:14px;font-family:Cairo,Arial,sans-serif;text-align:right;outline:none}
+.g2{display:flex;gap:8px}
+.g2 .fg{flex:1}
+.radio-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.ropt{flex:1;min-width:80px;background:#071828;border:1px solid #1E4060;border-radius:8px;padding:9px;text-align:center;font-size:12px;cursor:pointer;color:#8EAFC2}
+.ropt.sel{border-color:#00B4D8;background:#0A2A48;color:#00B4D8;font-weight:bold}
+.mdl-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.87);z-index:100;align-items:flex-end;justify-content:center}
+.mdl-bg.on{display:flex}
+.mdl{background:#0A2235;border-radius:20px 20px 0 0;padding:18px;width:100%;max-height:90vh;overflow-y:auto}
+.mdl-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.mdl-hdr h3{color:#00B4D8;font-size:15px}
+.mdl-close{background:#3D0A0A;color:#E63946;border:none;border-radius:8px;width:30px;height:30px;font-size:18px;cursor:pointer}
+.rep-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #1E4060;font-size:13px}
+.rep-row:last-child{border:none}
+.rep-num{font-size:20px;font-weight:bold}
+.doc-row{background:#071828;border-radius:8px;padding:10px;margin-bottom:8px;cursor:pointer}
+.doc-row:active{background:#0A2235}
+.conflict-row{background:#1a0505;border:1px solid #E63946;border-radius:8px;padding:10px;margin-bottom:8px;font-size:12px}
+.install-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:200;align-items:center;justify-content:center}
+.install-bg.on{display:flex}
+.install-card{background:#0A2235;border:1px solid #00B4D8;border-radius:18px;padding:28px 22px;width:88%;max-width:340px;text-align:center}
+.install-card img{width:70px;height:70px;border-radius:16px;margin-bottom:14px}
+.tst{position:fixed;bottom:74px;left:50%;transform:translateX(-50%);background:#2EC4B6;color:#020B14;padding:10px 22px;border-radius:8px;font-size:13px;font-weight:bold;z-index:300;opacity:0;transition:opacity .3s;white-space:nowrap;pointer-events:none}
+.tst.on{opacity:1}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.blink{animation:blink 1.2s infinite}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-title">
+    <img src="icon-192.png" alt="">
+    <h1>جداول المحاضرات</h1>
+  </div>
+  <div class="hdr-icons">
+    <button class="ic-btn" id="btnImport" title="استيراد">📥</button>
+    <button class="ic-btn" id="btnAlerts" title="تنبيهات">🔔</button>
+    <button class="ic-btn" id="btnInstall" title="تثبيت">📲</button>
+  </div>
+</div>
+
+<!-- شاشة الجدول الرئيسية -->
+<div id="mainView">
+  <div class="srch"><span style="color:#00B4D8">🔍</span><input id="mainSearch" type="text" placeholder="ابحث باسم الفرقة أو الدكتور..."></div>
+  <div class="filters">
+    <select id="fYear"><option value="">كل الفرق</option><option>الفرقة الأولى</option><option>الفرقة الثانية</option><option>الفرقة الثالثة</option><option>الفرقة الرابعة</option></select>
+    <select id="fDept"><option value="">كل الشعب</option><option value="أشعة">أشعة</option><option value="تحاليل">تحاليل</option><option value="تركيبات أسنان">أسنان</option></select>
+    <select id="fDay"><option value="">كل الأيام</option><option>السبت</option><option>الأحد</option><option>الاثنين</option><option>الثلاثاء</option><option>الأربعاء</option><option>الخميس</option></select>
+    <select id="fType"><option value="">كل الأنواع</option><option value="نظري">نظري</option><option value="عملي">عملي</option></select>
+  </div>
+  <div class="status-row">
+    <span id="conflictStatus" style="cursor:pointer">⏳ جاري الفحص...</span>
+    <button style="background:none;border:none;color:#00B4D8;font-size:12px;cursor:pointer;font-family:Cairo,Arial,sans-serif" onclick="render()">🔄 تحديث</button>
+  </div>
+  <div class="alrt" id="alrt" style="background:#052010;color:#2EC4B6;border:1px solid #2EC4B6">⏳ جاري الفحص...</div>
+  <div id="searchReport"></div>
+  <div id="weekView"></div>
+</div>
+
+<!-- شاشة المحاضرين -->
+<div class="sc" id="sc-docs">
+  <div class="card">
+    <h3>👨‍🏫 قائمة المحاضرين</h3>
+    <div id="docList"></div>
+  </div>
+</div>
+
+<!-- شاشة القاعات -->
+<div class="sc" id="sc-rooms">
+  <div class="card">
+    <h3>🏛️ قائمة القاعات</h3>
+    <div id="roomList"></div>
+  </div>
+</div>
+
+<!-- شاشة النسخ الاحتياطي -->
+<div class="sc" id="sc-backup">
+  <div class="card">
+    <h3>💾 النسخ الاحتياطي</h3>
+    <button class="btn" style="background:#0077A8" id="expBtn">💾 تصدير JSON</button>
+    <button class="btn" style="background:#1a0a3a" id="impBtnLbl">📥 استعادة من JSON</button>
+    <input type="file" id="impFile" accept=".json" style="display:none">
+    <button class="btn" style="background:#1a5c28" id="csvBtn">📊 تصدير CSV</button>
+    <button class="btn" style="background:#5c1a1a" id="sampleBtn">📋 تحميل بيانات تجريبية</button>
+    <div style="color:#8EAFC2;font-size:12px;line-height:2;margin-top:8px">
+      <div>📌 البيانات محفوظة تلقائياً في المتصفح</div>
+      <div>📌 يعمل بالكامل بدون إنترنت</div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <button class="nb on" id="nb0"><span>📅</span>الجدول</button>
+  <button class="nb" id="nb1"><span>👨‍🏫</span>محاضرين</button>
+  <button class="nb" id="nb2"><span>🏛️</span>قاعات</button>
+  <button class="nb" id="nb3"><span>💾</span>نسخ</button>
+</div>
+
+<button class="fab" id="fabAdd">+</button>
+
+<!-- مودال إضافة/تعديل حصة -->
+<div class="mdl-bg" id="addMdl">
+  <div class="mdl">
+    <div class="mdl-hdr">
+      <h3 id="addMdlTitle">➕ إضافة حصة</h3>
+      <button class="mdl-close" id="closeAddMdl">×</button>
+    </div>
+    <input type="hidden" id="editId">
+    <div class="fg"><label>الفرقة *</label>
+      <select id="fmYear"><option>الفرقة الأولى</option><option>الفرقة الثانية</option><option>الفرقة الثالثة</option><option>الفرقة الرابعة</option></select>
+    </div>
+    <div class="fg"><label>القسم *</label>
+      <select id="fmDept"><option value="أشعة">أشعة</option><option value="تحاليل">تحاليل</option><option value="تركيبات أسنان">تركيبات أسنان</option></select>
+    </div>
+    <div class="fg"><label>نوع الحصة</label>
+      <div class="radio-row">
+        <div class="ropt sel" id="rTheory">📝 نظري</div>
+        <div class="ropt" id="rPrac">🔬 عملي</div>
+      </div>
+    </div>
+    <div style="background:#071828;border:1px solid #00B4D8;border-radius:10px;padding:10px;margin-bottom:10px">
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;color:#F0F8FF;font-size:13px">
+        <input type="checkbox" id="fmCombined" style="width:20px;height:20px;accent-color:#00B4D8">
+        <span>📢 محاضرة مجمعة (أكثر من فرقة/شعبة في نفس الوقت والقاعة)</span>
+      </label>
+    </div>
+    <div class="fg"><label>اليوم *</label>
+      <select id="fmDay"><option>السبت</option><option>الأحد</option><option>الاثنين</option><option>الثلاثاء</option><option>الأربعاء</option><option>الخميس</option></select>
+    </div>
+    <div class="fg"><label>📅 تاريخ المحاضرة (اختياري)</label><input id="fmDate" type="date"></div>
+    <div class="fg"><label>اسم المادة *</label><input id="fmName" type="text" placeholder="اسم المادة الدراسية"></div>
+    <div class="fg"><label>اسم المحاضر *</label><input id="fmDoc" type="text" placeholder="د/ اسم المحاضر"></div>
+    <div class="g2">
+      <div class="fg"><label>من *</label><input id="fmFrom" type="time"></div>
+      <div class="fg"><label>إلى *</label><input id="fmTo" type="time"></div>
+    </div>
+    <div class="fg"><label>المكان *</label><input id="fmLoc" type="text" placeholder="مثال: قاعة بن النفيس"></div>
+    <div class="fg"><label>حالة الحصة</label>
+      <div class="radio-row">
+        <div class="ropt sel" id="rPending">⏳ لم تُعقد</div>
+        <div class="ropt" id="rDone">✅ تم</div>
+        <div class="ropt" id="rCancel">❌ ملغاة</div>
+        <div class="ropt" id="rPostpone">⏸️ مؤجلة</div>
+      </div>
+    </div>
+    <div class="fg" id="statusDateBox" style="display:none">
+      <label id="statusDateLbl">📅 تاريخ الإلغاء</label>
+      <input id="fmStatusDate" type="date">
+    </div>
+    <button class="btn" style="background:#1a5c28" id="saveLecBtn">💾 حفظ الحصة</button>
+    <button class="btn" style="background:#3D0A0A;color:#E63946;display:none" id="delLecBtn">🗑 حذف الحصة</button>
+    <button class="btn" style="background:#1E4060" id="cancelAddBtn">إلغاء</button>
+  </div>
+</div>
+
+<!-- مودال تقرير الدكتور -->
+<div class="mdl-bg" id="docMdl">
+  <div class="mdl">
+    <div class="mdl-hdr">
+      <h3 id="docMdlTitle">📊 تقرير المحاضر</h3>
+      <button class="mdl-close" id="closeDocMdl">×</button>
+    </div>
+    <div id="docMdlBody"></div>
+  </div>
+</div>
+
+<!-- مودال التعارضات -->
+<div class="mdl-bg" id="conflictMdl">
+  <div class="mdl">
+    <div class="mdl-hdr">
+      <h3>⚠️ التعارضات</h3>
+      <button class="mdl-close" id="closeConflictMdl">×</button>
+    </div>
+    <div id="conflictBody"></div>
+  </div>
+</div>
+
+<!-- مودال الاستيراد -->
+<div class="mdl-bg" id="importMdl">
+  <div class="mdl">
+    <div class="mdl-hdr">
+      <h3>📥 استيراد البيانات</h3>
+      <button class="mdl-close" id="closeImportMdl">×</button>
+    </div>
+    <div class="radio-row">
+      <div class="ropt sel" id="itImg">📷 صورة</div>
+      <div class="ropt" id="itFile">📄 ملف</div>
+      <div class="ropt" id="itText">✏️ نص</div>
+    </div>
+    <div id="itImgBox">
+      <div style="border:2px dashed #0077A8;border-radius:12px;padding:20px;text-align:center;background:#071828;margin-bottom:10px;cursor:pointer" id="imgDropArea">
+        <div style="font-size:36px">📷</div>
+        <p style="color:#00B4D8;font-size:14px;margin-top:8px;font-weight:bold">اضغط لاختيار صورة الجدول</p>
+        <small style="color:#8EAFC2">JPG / PNG</small>
+      </div>
+      <input type="file" id="imgFileInp" accept="image/*" style="display:none">
+      <div id="imgPrevBox" style="display:none"><img id="prevImg" style="width:100%;border-radius:10px;max-height:250px;object-fit:contain;border:1px solid #1E4060"></div>
+    </div>
+    <div id="itFileBox" style="display:none">
+      <div style="border:2px dashed #0077A8;border-radius:12px;padding:20px;text-align:center;background:#071828;margin-bottom:10px;cursor:pointer" id="fileDropArea">
+        <div style="font-size:36px">📊</div>
+        <p style="color:#00B4D8;font-size:14px;margin-top:8px;font-weight:bold">Excel / Word / CSV</p>
+      </div>
+      <input type="file" id="officeFileInp" accept=".xlsx,.xls,.csv,.docx,.doc,.txt" style="display:none">
+      <div id="fileNameBox" style="display:none;color:#2EC4B6;font-size:13px;padding:8px;background:#071828;border-radius:8px"></div>
+    </div>
+    <div id="itTextBox" style="display:none">
+      <textarea id="importTextArea" rows="5" style="width:100%;background:#071828;border:1px solid #0077A8;border-radius:8px;padding:10px;color:#F0F8FF;font-size:13px;font-family:Cairo,Arial,sans-serif;resize:vertical" placeholder="الصق نص الجدول هنا..."></textarea>
+    </div>
+    <div class="fg" style="margin-top:10px">
+      <label>🔑 مفتاح Anthropic API</label>
+      <input type="password" id="apiKeyInp" placeholder="sk-ant-..." style="font-size:12px">
+      <small style="color:#8EAFC2;font-size:11px;display:block;margin-top:3px">من console.anthropic.com — يُحفظ محلياً</small>
+    </div>
+    <div id="importLoadBox" style="display:none;text-align:center;padding:14px;color:#00B4D8">⏳ جاري الاستخراج بالذكاء الاصطناعي...</div>
+    <div id="importResultBox" style="display:none">
+      <div id="importResultCount" style="font-size:14px;font-weight:bold;margin-bottom:8px"></div>
+      <div id="importResultList" style="max-height:250px;overflow-y:auto"></div>
+      <button class="btn" style="background:#1a5c28;margin-top:8px" id="saveAllImportBtn">💾 حفظ جميع الحصص</button>
+    </div>
+    <button class="btn" style="background:#0077A8;margin-top:8px" id="doImportBtn">🤖 استخراج تلقائي</button>
+  </div>
+</div>
+
+<!-- مودال التنبيهات -->
+<div class="mdl-bg" id="alertsMdl">
+  <div class="mdl">
+    <div class="mdl-hdr">
+      <h3>🔔 تنبيهات اليوم</h3>
+      <button class="mdl-close" id="closeAlertsMdl">×</button>
+    </div>
+    <div id="alertsBody"></div>
+    <div class="fg" style="margin-top:12px"><label>⏰ وقت التنبيه اليومي</label><input id="alertTimeInp" type="time" value="07:00"></div>
+    <button class="btn" style="background:#0077A8" id="enableAlertsBtn">🔔 تفعيل التنبيه اليومي</button>
+  </div>
+</div>
+
+<!-- مودال التثبيت -->
+<div class="install-bg" id="installMdl">
+  <div class="install-card">
+    <img src="icon-192.png" alt="">
+    <h4 style="color:#00B4D8;font-size:18px;margin-bottom:6px">📲 تثبيت كتطبيق</h4>
+    <p style="color:#F4A261;font-size:13px;font-weight:bold;margin-bottom:4px">نظام إدارة جداول المحاضرات</p>
+    <p style="color:#8EAFC2;font-size:12px;margin-bottom:16px;line-height:1.6">ثبّت التطبيق على جوالك — يعمل بدون إنترنت</p>
+    <button class="btn" style="background:#00B4D8;color:#020B14;font-size:16px;padding:16px" id="doInstallBtn">📲 تثبيت التطبيق الآن</button>
+    <div style="color:#8EAFC2;font-size:11px;margin:8px 0 12px;line-height:2;background:#071828;border-radius:8px;padding:8px;text-align:right">
+      🤖 <b style="color:#F0F8FF">Android/Chrome:</b> ⋮ ← تثبيت التطبيق<br>
+      🍎 <b style="color:#F0F8FF">iPhone/Safari:</b> مشاركة ↑ ← إضافة للشاشة<br>
+      💻 <b style="color:#F0F8FF">كمبيوتر:</b> أيقونة التثبيت في شريط العنوان
+    </div>
+    <button class="btn" style="background:#1E4060;font-size:13px" id="laterInstallBtn">لاحقاً</button>
+  </div>
+</div>
+
+<div class="tst" id="tst"></div>
+
+<script>
+var DAYS=['السبت','الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس'];
+var deferredPrompt=null, curType='نظري', curStatus='pending', curEditId=null;
+var importType='img', importedData=[], officeContent='', officeFileName='';
+
+// ===== DB =====
+function gL(){try{return JSON.parse(localStorage.getItem('sch_lecs')||'[]')}catch(e){return[]}}
+function sL(d){try{localStorage.setItem('sch_lecs',JSON.stringify(d))}catch(e){}}
+function nId(a){if(!a.length)return 1;return Math.max.apply(null,a.map(function(x){return x.id}))+1}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function toast(m){var t=document.getElementById('tst');t.textContent=m;t.className='tst on';setTimeout(function(){t.className='tst'},2600)}
+
+// ===== NAV =====
+var curTab=0;
+function showTab(n){
+  curTab=n;
+  document.getElementById('mainView').style.display=n===0?'block':'none';
+  ['sc-docs','sc-rooms','sc-backup'].forEach(function(id,i){
+    document.getElementById(id).style.display=n===(i+1)?'block':'none';
+  });
+  document.querySelectorAll('.nb').forEach(function(b,i){b.classList.toggle('on',i===n)});
+  document.getElementById('fabAdd').style.display=n===0?'flex':'none';
+  if(n===0)render();
+  if(n===1)renderDocs();
+  if(n===2)renderRooms();
+}
+
+// ===== TODAY =====
+function todayName(){
+  var d=new Date().getDay(); // 0=Sun
+  var map={0:'الأحد',1:'الاثنين',2:'الثلاثاء',3:'الأربعاء',4:'الخميس',5:'الجمعة',6:'السبت'};
+  return map[d]||'';
+}
+
+// ===== ALERT BOX =====
+function updateAlrt(){
+  var td=todayName();
+  var lecs=gL().filter(function(l){return l.day===td});
+  var a=document.getElementById('alrt');
+  if(!lecs.length){
+    a.textContent='🟢 لا توجد محاضرات اليوم ('+td+')';
+    a.style.cssText='margin:0 12px 8px;padding:10px 14px;border-radius:10px;text-align:center;font-size:13px;font-weight:bold;background:#052010;color:#2EC4B6;border:1px solid #2EC4B6';
+    a.className='alrt';
+  } else {
+    var first=lecs.sort(function(a,b){return a.from<b.from?-1:1})[0];
+    a.textContent='📅 اليوم '+td+': '+lecs.length+' محاضرة — أول حصة '+first.from+' ('+first.loc+')';
+    a.style.cssText='margin:0 12px 8px;padding:10px 14px;border-radius:10px;text-align:center;font-size:13px;font-weight:bold;background:#2D1500;color:#F4A261;border:1px solid #F4A261';
+    a.className='alrt blink';
+  }
+}
+
+// ===== CONFLICTS =====
+function findConflicts(){
+  var lecs=gL(),conflicts=[];
+  for(var i=0;i<lecs.length;i++){
+    for(var j=i+1;j<lecs.length;j++){
+      var a=lecs[i],b=lecs[j];
+      var combined=a.combined&&b.combined&&a.day===b.day&&a.loc===b.loc&&a.doc===b.doc&&a.from===b.from;
+      if(combined)continue;
+      if(a.day===b.day&&a.loc===b.loc){
+        if(a.from<b.to&&b.from<a.to)conflicts.push({a:a,b:b,type:'قاعة: '+a.loc});
+      }
+      if(a.day===b.day&&a.doc===b.doc&&!combined){
+        if(a.from<b.to&&b.from<a.to)conflicts.push({a:a,b:b,type:'دكتور: '+a.doc});
+      }
+    }
+  }
+  return conflicts;
+}
+
+function updateConflictStatus(){
+  var c=findConflicts();
+  var el=document.getElementById('conflictStatus');
+  if(!c.length){el.textContent='✅ لا توجد تعارضات';el.style.color='#2EC4B6';el.onclick=null;}
+  else{el.textContent='⚠️ '+c.length+' تعارض — اضغط للتفاصيل';el.style.color='#E63946';el.onclick=function(){showConflicts(c)};}
+}
+
+function showConflicts(conflicts){
+  var html=conflicts.map(function(c){
+    return '<div class="conflict-row">'+
+      '<b style="color:#E63946">⚠️ تعارض في '+esc(c.type)+'</b><br>'+
+      '<div style="margin-top:6px">📌 '+esc(c.a.name)+' ('+esc(c.a.year)+') — '+c.a.day+' '+c.a.from+'-'+c.a.to+'</div>'+
+      '<div>📌 '+esc(c.b.name)+' ('+esc(c.b.year)+') — '+c.b.day+' '+c.b.from+'-'+c.b.to+'</div>'+
+      '<div style="color:#8EAFC2;font-size:11px;margin-top:4px">💡 فعّل "محاضرة مجمعة" إذا كانتا في نفس الحصة</div>'+
+      '</div>';
+  }).join('');
+  document.getElementById('conflictBody').innerHTML=html||'<div style="color:#2EC4B6;text-align:center">✅ لا توجد تعارضات</div>';
+  document.getElementById('conflictMdl').classList.add('on');
+}
+
+function hasConflict(lec,conflicts){
+  return conflicts.some(function(c){return c.a.id===lec.id||c.b.id===lec.id});
+}
+
+// ===== SEARCH REPORT =====
+function updateSearchReport(q){
+  var box=document.getElementById('searchReport');
+  if(!q){box.innerHTML='';return}
+  var lecs=gL();
+  var matchDocs={};
+  lecs.forEach(function(l){if(l.doc&&l.doc.toLowerCase().indexOf(q)>=0)matchDocs[l.doc]=1});
+  var docNames=Object.keys(matchDocs);
+  if(!docNames.length){box.innerHTML='';return}
+  var html='';
+  docNames.forEach(function(n){
+    var dl=lecs.filter(function(l){return l.doc===n});
+    var done=dl.filter(function(l){return l.status==='done'}).length;
+    var cancel=dl.filter(function(l){return l.status==='cancel'}).length;
+    var postpone=dl.filter(function(l){return l.status==='postpone'}).length;
+    var present=dl.filter(function(l){return l.attend==='present'}).length;
+    var absent=dl.filter(function(l){return l.attend==='absent'}).length;
+    html+='<div class="doc-row" style="margin:0 12px 8px;background:#0A2235;border:1px solid #1E4060;border-radius:10px;padding:12px" data-doc="'+esc(n)+'">';
+    html+='<b style="color:#48CAE4;font-size:14px">👨‍🏫 '+esc(n)+'</b>';
+    html+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">';
+    html+='<span class="pill p-done">✅ '+done+'</span>';
+    html+='<span class="pill p-cancel">❌ '+cancel+'</span>';
+    html+='<span class="pill p-postpone">⏸️ '+postpone+'</span>';
+    html+='<span style="background:#0A3D20;color:#2EC4B6;display:inline-block;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:bold">🟢 حضر '+present+'</span>';
+    html+='<span style="background:#3D0A0A;color:#E63946;display:inline-block;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:bold">🔴 غاب '+absent+'</span>';
+    html+='</div><div style="color:#8EAFC2;font-size:11px;margin-top:4px">اضغط للتقرير الكامل</div></div>';
+  });
+  box.innerHTML=html;
+  box.querySelectorAll('.doc-row').forEach(function(row){
+    row.addEventListener('click',function(){openDocReport(this.getAttribute('data-doc'))});
+  });
+}
+
+// ===== RENDER WEEK =====
+function render(){
+  updateAlrt();
+  var q=(document.getElementById('mainSearch').value||'').toLowerCase().trim();
+  var fYear=document.getElementById('fYear').value;
+  var fDept=document.getElementById('fDept').value;
+  var fDay=document.getElementById('fDay').value;
+  var fType=document.getElementById('fType').value;
+  updateSearchReport(q);
+  var conflicts=findConflicts();
+  updateConflictStatus();
+  var allLecs=gL();
+  var filtered=allLecs.filter(function(l){
+    if(fYear&&l.year!==fYear)return false;
+    if(fDept&&l.dept.indexOf(fDept)<0)return false;
+    if(fDay&&l.day!==fDay)return false;
+    if(fType&&l.type!==fType)return false;
+    if(q){
+      var hit=(l.year&&l.year.toLowerCase().indexOf(q)>=0)||(l.doc&&l.doc.toLowerCase().indexOf(q)>=0)||(l.name&&l.name.toLowerCase().indexOf(q)>=0);
+      if(!hit)return false;
+    }
+    return true;
+  });
+  var daysToShow=fDay?[fDay]:DAYS;
+  var td=todayName();
+  var html='';
+  daysToShow.forEach(function(day){
+    var dayLecs=filtered.filter(function(l){return l.day===day}).sort(function(a,b){return a.from<b.from?-1:1});
+    html+='<div class="day-block"><div class="day-hdr"><span>📆 يوم '+day+'</span>'+(day===td?'<span class="today-b">اليوم</span>':'')+'</div>';
+    if(!dayLecs.length){html+='<div class="empty">لا توجد حصص</div>';}
+    else{
+      dayLecs.forEach(function(l){
+        var conflict=hasConflict(l,conflicts);
+        var statusPill='';
+        var itemStyle='';
+        if(l.status==='done')statusPill='<span class="pill p-done">✅ تم</span>';
+        else if(l.status==='cancel'){statusPill='<span class="pill p-cancel">❌ ملغاة'+(l.statusDate?' '+l.statusDate:'')+'</span>';itemStyle='opacity:.6'}
+        else if(l.status==='postpone'){statusPill='<span class="pill p-postpone">⏸️ مؤجلة'+(l.statusDate?' '+l.statusDate:'')+'</span>';itemStyle='opacity:.6'}
+        else statusPill='<span class="pill p-pending">⏳ لم تُعقد</span>';
+        var deptPill=l.dept==='أشعة'?'p-xray':l.dept==='تحاليل'?'p-lab':'p-dent';
+        var typePill=l.type==='عملي'?'p-prac':'p-theory';
+        var attendBadge='';
+        if(l.attend==='present')attendBadge='<span style="background:#0A3D20;color:#2EC4B6;display:inline-block;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:bold">🟢 حاضر</span>';
+        else if(l.attend==='absent')attendBadge='<span style="background:#3D0A0A;color:#E63946;display:inline-block;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:bold">🔴 غائب</span>';
+        html+='<div class="lec" data-id="'+l.id+'" style="'+itemStyle+'">';
+        html+='<div class="lec-top">';
+        html+='<span class="pill '+deptPill+'">'+esc(l.dept)+'</span>';
+        html+='<span class="pill '+typePill+'">'+(l.type==='عملي'?'🔬':'📝')+' '+l.type+'</span>';
+        if(l.combined)html+='<span class="pill p-combined">📢 مجمعة</span>';
+        html+=statusPill;
+        if(conflict)html+='<span style="color:#E63946">⚠️</span>';
+        html+='</div>';
+        html+='<span class="lec-time">⏰ '+l.from+' - '+l.to+'</span>';
+        html+='<div class="lec-name">'+esc(l.name)+' <span style="color:#8EAFC2;font-size:11px;font-weight:normal">('+esc(l.year)+')</span></div>';
+        html+='<div class="lec-doc">👨‍🏫 '+esc(l.doc)+'</div>';
+        html+='<span class="lec-loc">📍 '+esc(l.loc)+'</span>';
+        if(l.date)html+=' <span style="color:#8EAFC2;font-size:11px">📅 '+l.date+'</span>';
+        html+=attendBadge;
+        // أزرار الحضور
+        html+='<div class="attend-row">';
+        html+='<span class="attend-lbl">👨‍🏫 حضور الدكتور:</span>';
+        html+='<div class="attend-btns">';
+        html+='<button class="ab-yes" data-id="'+l.id+'" data-val="present">✅ حاضر</button>';
+        html+='<button class="ab-no" data-id="'+l.id+'" data-val="absent">❌ غائب</button>';
+        html+='</div></div>';
+        html+='</div>';
+      });
+    }
+    html+='</div>';
+  });
+  if(!allLecs.length){
+    html='<div style="text-align:center;color:#8EAFC2;padding:40px 20px;font-size:14px"><div style="font-size:40px;margin-bottom:12px">📅</div><div>لا توجد محاضرات بعد</div><div style="font-size:12px;margin-top:8px;color:#4a6a7a">اضغط + لإضافة أول محاضرة<br>أو اضغط 💾 ← تحميل بيانات تجريبية</div></div>';
+  }
+  document.getElementById('weekView').innerHTML=html;
+  // ربط الأحداث
+  document.querySelectorAll('.lec').forEach(function(el){
+    el.addEventListener('click',function(e){
+      if(e.target.classList.contains('ab-yes')||e.target.classList.contains('ab-no'))return;
+      openEdit(parseInt(this.getAttribute('data-id')));
+    });
+  });
+  document.querySelectorAll('.ab-yes,.ab-no').forEach(function(btn){
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();
+      var id=parseInt(this.getAttribute('data-id'));
+      var val=this.getAttribute('data-val');
+      var lecs=gL();
+      for(var k=0;k<lecs.length;k++){if(lecs[k].id===id){lecs[k].attend=val;break}}
+      sL(lecs);
+      toast(val==='present'?'✅ تم تسجيل حضور الدكتور!':'❌ تم تسجيل غياب الدكتور!');
+      render();
+    });
+  });
+}
+
+// ===== ADD/EDIT =====
+function openAdd(){
+  curEditId=null;
+  document.getElementById('editId').value='';
+  document.getElementById('addMdlTitle').textContent='➕ إضافة حصة جديدة';
+  document.getElementById('fmName').value='';
+  document.getElementById('fmDoc').value='';
+  document.getElementById('fmLoc').value='';
+  document.getElementById('fmFrom').value='';
+  document.getElementById('fmTo').value='';
+  document.getElementById('fmDate').value='';
+  document.getElementById('fmStatusDate').value='';
+  document.getElementById('fmCombined').checked=false;
+  document.getElementById('statusDateBox').style.display='none';
+  document.getElementById('delLecBtn').style.display='none';
+  setType('نظري'); setStatus('pending');
+  document.getElementById('addMdl').classList.add('on');
+}
+
+function openEdit(id){
+  var l=gL().find(function(x){return x.id===id});
+  if(!l)return;
+  curEditId=id;
+  document.getElementById('editId').value=id;
+  document.getElementById('addMdlTitle').textContent='✏️ تعديل الحصة';
+  document.getElementById('fmYear').value=l.year;
+  document.getElementById('fmDept').value=l.dept;
+  document.getElementById('fmDay').value=l.day;
+  document.getElementById('fmName').value=l.name||'';
+  document.getElementById('fmDoc').value=l.doc||'';
+  document.getElementById('fmFrom').value=l.from||'';
+  document.getElementById('fmTo').value=l.to||'';
+  document.getElementById('fmLoc').value=l.loc||'';
+  document.getElementById('fmDate').value=l.date||'';
+  document.getElementById('fmStatusDate').value=l.statusDate||'';
+  document.getElementById('fmCombined').checked=!!l.combined;
+  document.getElementById('delLecBtn').style.display='block';
+  setType(l.type||'نظري'); setStatus(l.status||'pending');
+  document.getElementById('addMdl').classList.add('on');
+}
+
+function setType(t){
+  curType=t;
+  document.getElementById('rTheory').classList.toggle('sel',t==='نظري');
+  document.getElementById('rPrac').classList.toggle('sel',t==='عملي');
+}
+
+function setStatus(s){
+  curStatus=s;
+  ['rPending','rDone','rCancel','rPostpone'].forEach(function(id){document.getElementById(id).classList.remove('sel')});
+  var map={pending:'rPending',done:'rDone',cancel:'rCancel',postpone:'rPostpone'};
+  if(map[s])document.getElementById(map[s]).classList.add('sel');
+  var box=document.getElementById('statusDateBox');
+  var lbl=document.getElementById('statusDateLbl');
+  if(s==='cancel'){box.style.display='block';lbl.textContent='📅 تاريخ الإلغاء'}
+  else if(s==='postpone'){box.style.display='block';lbl.textContent='📅 تاريخ التأجيل'}
+  else box.style.display='none';
+}
+
+function saveLec(){
+  var year=document.getElementById('fmYear').value;
+  var dept=document.getElementById('fmDept').value;
+  var day=document.getElementById('fmDay').value;
+  var name=document.getElementById('fmName').value.trim();
+  var doc=document.getElementById('fmDoc').value.trim();
+  var from=document.getElementById('fmFrom').value;
+  var to=document.getElementById('fmTo').value;
+  var loc=document.getElementById('fmLoc').value.trim();
+  var date=document.getElementById('fmDate').value;
+  var statusDate=document.getElementById('fmStatusDate').value;
+  var combined=document.getElementById('fmCombined').checked;
+  if(!name){toast('❌ أدخل اسم المادة!');return}
+  if(!doc){toast('❌ أدخل اسم المحاضر!');return}
+  if(!from||!to){toast('❌ أدخل وقت الحصة!');return}
+  if(!loc){toast('❌ أدخل المكان!');return}
+  if((curStatus==='cancel'||curStatus==='postpone')&&!statusDate){toast('❌ أدخل التاريخ!');return}
+  var lecs=gL();
+  var obj={year:year,dept:dept,type:curType,combined:combined,day:day,from:from,to:to,name:name,doc:doc,loc:loc,date:date,status:curStatus,statusDate:statusDate};
+  if(curEditId){
+    var idx=lecs.findIndex(function(x){return x.id===curEditId});
+    if(idx>=0){obj.id=curEditId;obj.attend=lecs[idx].attend;lecs[idx]=obj;}
+    toast('✅ تم تعديل الحصة!');
+  } else {
+    obj.id=nId(lecs);lecs.push(obj);
+    toast('✅ تم إضافة الحصة!');
+  }
+  sL(lecs);
+  document.getElementById('addMdl').classList.remove('on');
+  render();
+}
+
+function delLec(){
+  if(!curEditId)return;
+  if(!confirm('حذف هذه الحصة؟'))return;
+  sL(gL().filter(function(x){return x.id!==curEditId}));
+  document.getElementById('addMdl').classList.remove('on');
+  toast('🗑 تم الحذف');
+  render();
+}
+
+// ===== DOCTORS =====
+function renderDocs(){
+  var lecs=gL();
+  var docs={};
+  lecs.forEach(function(l){if(!docs[l.doc])docs[l.doc]=[];docs[l.doc].push(l)});
+  var names=Object.keys(docs).sort();
+  var html='';
+  if(!names.length){document.getElementById('docList').innerHTML='<div style="text-align:center;color:#8EAFC2;padding:20px">لا يوجد محاضرون بعد</div>';return}
+  names.forEach(function(n){
+    var dl=docs[n];
+    var done=dl.filter(function(l){return l.status==='done'}).length;
+    var cancel=dl.filter(function(l){return l.status==='cancel'}).length;
+    var postpone=dl.filter(function(l){return l.status==='postpone'}).length;
+    var present=dl.filter(function(l){return l.attend==='present'}).length;
+    var absent=dl.filter(function(l){return l.attend==='absent'}).length;
+    html+='<div class="doc-row" data-doc="'+esc(n)+'">';
+    html+='<b style="color:#48CAE4">'+esc(n)+'</b>';
+    html+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">';
+    html+='<span class="pill" style="background:#1E4060;color:#F0F8FF">📚 '+dl.length+'</span>';
+    html+='<span class="pill p-done">✅ '+done+'</span>';
+    html+='<span class="pill p-cancel">❌ '+cancel+'</span>';
+    html+='<span class="pill p-postpone">⏸️ '+postpone+'</span>';
+    html+='<span style="background:#0A3D20;color:#2EC4B6;display:inline-block;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:bold">🟢 '+present+'</span>';
+    html+='<span style="background:#3D0A0A;color:#E63946;display:inline-block;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:bold">🔴 '+absent+'</span>';
+    html+='</div></div>';
+  });
+  document.getElementById('docList').innerHTML=html;
+  document.querySelectorAll('#docList .doc-row').forEach(function(row){
+    row.addEventListener('click',function(){openDocReport(this.getAttribute('data-doc'))});
+  });
+}
+
+function openDocReport(docName){
+  var lecs=gL().filter(function(l){return l.doc===docName});
+  var done=lecs.filter(function(l){return l.status==='done'});
+  var cancel=lecs.filter(function(l){return l.status==='cancel'});
+  var postpone=lecs.filter(function(l){return l.status==='postpone'});
+  var pending=lecs.filter(function(l){return !l.status||l.status==='pending'});
+  var present=lecs.filter(function(l){return l.attend==='present'});
+  var absent=lecs.filter(function(l){return l.attend==='absent'});
+  document.getElementById('docMdlTitle').textContent='📊 '+docName;
+  var html='<div style="background:#071828;border-radius:10px;padding:12px;margin-bottom:12px">';
+  html+='<div class="rep-row"><span>📚 إجمالي الحصص</span><b class="rep-num" style="color:#00B4D8">'+lecs.length+'</b></div>';
+  html+='<div class="rep-row"><span>✅ تم إلقاؤها</span><b class="rep-num" style="color:#2EC4B6">'+done.length+'</b></div>';
+  html+='<div class="rep-row"><span>❌ ملغاة</span><b class="rep-num" style="color:#E63946">'+cancel.length+'</b></div>';
+  html+='<div class="rep-row"><span>⏸️ مؤجلة</span><b class="rep-num" style="color:#48CAE4">'+postpone.length+'</b></div>';
+  html+='<div class="rep-row"><span>⏳ لم تُعقد</span><b class="rep-num" style="color:#F4A261">'+pending.length+'</b></div>';
+  html+='<div class="rep-row" style="border-top:1px solid #1E4060;margin-top:4px;padding-top:4px"><span>🟢 حضر فعلياً</span><b class="rep-num" style="color:#2EC4B6">'+present.length+'</b></div>';
+  html+='<div class="rep-row"><span>🔴 غاب</span><b class="rep-num" style="color:#E63946">'+absent.length+'</b></div>';
+  html+='</div>';
+  function grp(title,arr,color,showDate){
+    if(!arr.length)return'';
+    var h='<div style="color:'+color+';font-size:12px;font-weight:bold;margin:10px 0 6px">'+title+'</div>';
+    arr.sort(function(a,b){return DAYS.indexOf(a.day)-DAYS.indexOf(b.day)}).forEach(function(l){
+      var dt=showDate&&l.statusDate?' — 📅 '+l.statusDate:'';
+      h+='<div style="font-size:12px;color:#8EAFC2;margin-bottom:4px;padding-right:8px;border-right:2px solid '+color+'">'+l.day+' '+l.from+'-'+l.to+' — '+esc(l.name)+' ('+esc(l.year)+') — '+esc(l.loc)+dt+'</div>';
+    });
+    return h;
+  }
+  html+=grp('✅ الحصص التي تم إلقاؤها',done,'#2EC4B6',false);
+  html+=grp('❌ الحصص الملغاة',cancel,'#E63946',true);
+  html+=grp('⏸️ الحصص المؤجلة',postpone,'#48CAE4',true);
+  html+=grp('⏳ الحصص القادمة',pending,'#F4A261',false);
+  document.getElementById('docMdlBody').innerHTML=html;
+  document.getElementById('docMdl').classList.add('on');
+}
+
+// ===== ROOMS =====
+function renderRooms(){
+  var lecs=gL();
+  var rooms={};
+  lecs.forEach(function(l){if(!rooms[l.loc])rooms[l.loc]=[];rooms[l.loc].push(l)});
+  var names=Object.keys(rooms).sort();
+  var html='';
+  if(!names.length){document.getElementById('roomList').innerHTML='<div style="text-align:center;color:#8EAFC2;padding:20px">لا توجد قاعات</div>';return}
+  names.forEach(function(n){
+    html+='<div style="margin-bottom:14px"><b style="color:#F4A261">📍 '+esc(n)+'</b> <span style="color:#8EAFC2;font-size:11px">('+rooms[n].length+')</span>';
+    rooms[n].sort(function(a,b){return DAYS.indexOf(a.day)-DAYS.indexOf(b.day)}).forEach(function(l){
+      html+='<div style="font-size:12px;color:#8EAFC2;margin-top:4px;padding-right:8px;border-right:2px solid #F4A261">'+l.day+' '+l.from+'-'+l.to+' — '+esc(l.name)+' — '+esc(l.doc)+'</div>';
+    });
+    html+='</div>';
+  });
+  document.getElementById('roomList').innerHTML=html;
+}
+
+// ===== BACKUP =====
+function expBackup(){
+  var a=document.createElement('a');
+  a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify({lecs:gL()}));
+  a.download='schedule.json';document.body.appendChild(a);a.click();document.body.removeChild(a);
+  toast('✅ تم التصدير!');
+}
+function impBackup(inp){
+  if(!inp.files||!inp.files[0])return;
+  var r=new FileReader();
+  r.onload=function(e){
+    try{var d=JSON.parse(e.target.result);if(confirm('استبدال كل البيانات؟')){if(d.lecs)sL(d.lecs);toast('✅ تم الاستعادة!');render()}}
+    catch(ex){toast('❌ ملف غير صالح!')}
+  };
+  r.readAsText(inp.files[0]);
+}
+function expCSV(){
+  var lecs=gL();
+  var rows=[['الفرقة','القسم','النوع','اليوم','التاريخ','من','إلى','المادة','المحاضر','المكان','الحالة','الحضور']];
+  lecs.forEach(function(l){rows.push([l.year,l.dept,l.type||'نظري',l.day,l.date||'',l.from,l.to,l.name,l.doc,l.loc,l.status||'pending',l.attend||''])});
+  var csv=rows.map(function(r){return r.map(function(v){return'"'+String(v).replace(/"/g,'""')+'"'}).join(',')}).join('\n');
+  var a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download='schedule.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);
+  toast('📊 تم التصدير!');
+}
+function loadSample(){
+  if(!confirm('إضافة بيانات تجريبية؟'))return;
+  var s=[
+    {year:'الفرقة الأولى',dept:'أشعة',type:'نظري',day:'السبت',from:'09:00',to:'11:00',name:'تكنولوجيا التصوير الاشعاعي',doc:'د/ احمد مختار',loc:'مدرج بن سينا',status:'pending'},
+    {year:'الفرقة الأولى',dept:'تحاليل',type:'نظري',day:'الأحد',from:'09:00',to:'11:00',name:'مكافحة عدوى',doc:'د/ محي الدين شيخون',loc:'مدرج بن سينا',status:'done'},
+    {year:'الفرقة الثانية',dept:'تركيبات أسنان',type:'عملي',day:'السبت',from:'11:00',to:'13:00',name:'مواد صناعة الاسنان 2',doc:'د/ محمود عبدالله',loc:'قاعة بن هيثم',status:'pending'},
+    {year:'الفرقة الثالثة',dept:'أشعة',type:'نظري',day:'السبت',from:'09:00',to:'11:00',name:'تشخيص الأورام بالرنين',doc:'د/ احمد سمير',loc:'قاعة السيمينار',status:'cancel',statusDate:'2025-03-10'},
+    {year:'الفرقة الرابعة',dept:'تحاليل',type:'نظري',day:'الاثنين',from:'11:00',to:'13:00',name:'علم الغدد الصماء',doc:'د/ هبة عبدالله',loc:'قاعة السيمنار',status:'postpone',statusDate:'2025-03-12'}
+  ];
+  var c=gL();
+  s.forEach(function(x){x.id=nId(c);c.push(x)});
+  sL(c);toast('✅ تم تحميل '+s.length+' حصة!');render();
+}
+
+// ===== ALERTS =====
+function showAlertsModal(){
+  var td=todayName();
+  var lecs=gL().filter(function(l){return l.day===td}).sort(function(a,b){return a.from<b.from?-1:1});
+  var html='<b style="color:#00B4D8">📆 محاضرات اليوم ('+td+')</b><br><br>';
+  if(!lecs.length){html+='<div style="color:#2EC4B6">🟢 لا توجد محاضرات اليوم</div>';}
+  else{lecs.forEach(function(l){html+='<div style="background:#071828;border-radius:8px;padding:8px;margin-bottom:6px;border-right:3px solid #00B4D8;font-size:13px">⏰ <b>'+l.from+'-'+l.to+'</b><br>📝 '+esc(l.name)+' ('+esc(l.year)+')<br>👨‍🏫 '+esc(l.doc)+'<br>📍 '+esc(l.loc)+'</div>'})}
+  document.getElementById('alertsBody').innerHTML=html;
+  document.getElementById('alertsMdl').classList.add('on');
+}
+function enableAlerts(){
+  if(!('Notification' in window)){toast('❌ المتصفح لا يدعم التنبيهات');return}
+  Notification.requestPermission().then(function(p){
+    if(p==='granted'){var t=document.getElementById('alertTimeInp').value||'07:00';localStorage.setItem('sch_atime',t);localStorage.setItem('sch_aenable','1');toast('✅ تم تفعيل التنبيه الساعة '+t);}
+    else toast('❌ يجب السماح بالتنبيهات');
+  });
+}
+
+// ===== IMPORT =====
+function setImportType(t){
+  importType=t;
+  ['itImg','itFile','itText'].forEach(function(id){document.getElementById(id).classList.remove('sel')});
+  document.getElementById('it'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('sel');
+  document.getElementById('itImgBox').style.display=t==='img'?'block':'none';
+  document.getElementById('itFileBox').style.display=t==='file'?'block':'none';
+  document.getElementById('itTextBox').style.display=t==='text'?'block':'none';
+}
+
+function pickImgFile(){
+  var inp=document.getElementById('imgFileInp');
+  inp.value='';inp.onchange=function(e){
+    var f=e.target.files&&e.target.files[0];if(!f)return;
+    var rd=new FileReader();
+    rd.onload=function(ev){document.getElementById('prevImg').src=ev.target.result;document.getElementById('imgPrevBox').style.display='block'};
+    rd.readAsDataURL(f);
+  };inp.click();
+}
+
+function pickOfficeFile(){
+  var inp=document.getElementById('officeFileInp');
+  inp.value='';inp.onchange=function(e){
+    var f=e.target.files&&e.target.files[0];if(!f)return;
+    officeFileName=f.name;
+    var rd=new FileReader();
+    rd.onload=function(ev){officeContent=ev.target.result;document.getElementById('fileNameBox').style.display='block';document.getElementById('fileNameBox').textContent='✅ '+f.name};
+    if(f.name.match(/\.(xlsx|xls)$/i)){rd.readAsArrayBuffer(f);}
+    else{rd.readAsText(f,'utf-8');}
+  };inp.click();
+}
+
+async function doImport(){
+  var key=document.getElementById('apiKeyInp').value.trim()||localStorage.getItem('sch_apikey')||'';
+  if(!key){toast('❌ أدخل مفتاح API!');return}
+  localStorage.setItem('sch_apikey',key);
+  document.getElementById('importLoadBox').style.display='block';
+  document.getElementById('importResultBox').style.display='none';
+  document.getElementById('doImportBtn').style.display='none';
+  var prompt='أنت خبير في قراءة جداول المحاضرات العربية. استخرج بيانات المحاضرات وأعطني JSON array فقط بدون أي نص آخر. كل حصة: {year, dept (أشعة أو تحاليل أو تركيبات أسنان), day (يوم عربي), from (HH:MM), to (HH:MM), name, doc, loc, type (نظري أو عملي)}';
+  try{
+    var content=[];
+    if(importType==='img'){
+      var src=document.getElementById('prevImg').src;
+      if(!src||src===window.location.href){toast('❌ اختر صورة!');throw new Error('no image')}
+      var b64=src.split(',')[1];var mime=src.split(';')[0].split(':')[1]||'image/jpeg';
+      content=[{type:'image',source:{type:'base64',media_type:mime,data:b64}},{type:'text',text:prompt}];
+    } else if(importType==='file'){
+      if(!officeContent){toast('❌ اختر ملفاً!');throw new Error('no file')}
+      content=[{type:'text',text:prompt+'\n\nمحتوى الملف ('+officeFileName+'):\n'+String(officeContent).substring(0,8000)}];
+    } else {
+      var txt=document.getElementById('importTextArea').value.trim();
+      if(!txt){toast('❌ أدخل النص!');throw new Error('no text')}
+      content=[{type:'text',text:prompt+'\n\nالنص:\n'+txt}];
+    }
+    var resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2000,messages:[{role:'user',content:content}]})});
+    if(!resp.ok){var err=await resp.json();throw new Error(err.error?err.error.message:'خطأ '+resp.status)}
+    var data=await resp.json();
+    var txt2=data.content[0].text.trim();
+    var m=txt2.match(/\[[\s\S]*\]/);
+    if(!m)throw new Error('لم يتم إرجاع JSON');
+    importedData=JSON.parse(m[0]).filter(function(l){return l.name||l.doc});
+    renderImportResults();
+  }catch(e){
+    document.getElementById('importLoadBox').style.display='none';
+    document.getElementById('doImportBtn').style.display='block';
+    if(String(e.message).indexOf('no ')>=0)return;
+    toast('❌ '+(e.message||'خطأ').substring(0,60));
+  }
+}
+
+function renderImportResults(){
+  document.getElementById('importLoadBox').style.display='none';
+  document.getElementById('doImportBtn').style.display='block';
+  document.getElementById('importResultBox').style.display='block';
+  if(!importedData.length){document.getElementById('importResultCount').innerHTML='<span style="color:#E63946">❌ لم يتم استخراج بيانات</span>';document.getElementById('importResultList').innerHTML='';document.getElementById('saveAllImportBtn').style.display='none';return}
+  document.getElementById('importResultCount').innerHTML='✅ تم استخراج <b>'+importedData.length+'</b> حصة';
+  document.getElementById('saveAllImportBtn').style.display='block';
+  var html='';
+  importedData.forEach(function(l,i){
+    html+='<div style="background:#071828;border:1px solid #1E4060;border-radius:8px;padding:10px;margin-bottom:8px;font-size:12px">';
+    html+='<b style="color:#48CAE4">'+esc(l.name||'')+'</b> — '+esc(l.doc||'')+'<br>';
+    html+='<span style="color:#8EAFC2">'+esc(l.year||'')+' | '+esc(l.dept||'')+' | '+esc(l.day||'')+' '+esc(l.from||'')+'-'+esc(l.to||'')+' | '+esc(l.loc||'')+'</span><br>';
+    html+='<div style="display:flex;gap:6px;margin-top:6px">';
+    html+='<button style="flex:1;padding:6px;background:#0A3020;color:#2EC4B6;border:none;border-radius:5px;font-family:Cairo,Arial,sans-serif;font-size:12px;cursor:pointer" data-idx="'+i+'" class="imp-save">✅ حفظ</button>';
+    html+='<button style="padding:6px 10px;background:#3D0A0A;color:#E63946;border:none;border-radius:5px;font-family:Cairo,Arial,sans-serif;font-size:12px;cursor:pointer" data-idx="'+i+'" class="imp-del">🗑</button>';
+    html+='</div></div>';
+  });
+  document.getElementById('importResultList').innerHTML=html;
+  document.querySelectorAll('.imp-save').forEach(function(btn){btn.addEventListener('click',function(){saveOneImport(parseInt(this.getAttribute('data-idx')))})});
+  document.querySelectorAll('.imp-del').forEach(function(btn){btn.addEventListener('click',function(){importedData.splice(parseInt(this.getAttribute('data-idx')),1);renderImportResults()})});
+}
+
+function saveOneImport(i){
+  var l=importedData[i];var lecs=gL();l.id=nId(lecs);l.status='pending';lecs.push(l);sL(lecs);
+  importedData.splice(i,1);renderImportResults();toast('✅ تم الحفظ!');render();
+}
+function saveAllImport(){
+  var lecs=gL();var saved=0;
+  importedData.forEach(function(l){l.id=nId(lecs);l.status='pending';lecs.push(l);saved++});
+  sL(lecs);importedData=[];
+  document.getElementById('importResultBox').style.display='none';
+  toast('✅ تم حفظ '+saved+' حصة!');
+  document.getElementById('importMdl').classList.remove('on');
+  render();
+}
+
+// ===== PWA =====
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;if(!localStorage.getItem('sch_installed'))setTimeout(function(){document.getElementById('installMdl').classList.add('on')},800)});
+window.addEventListener('appinstalled',function(){localStorage.setItem('sch_installed','1');document.getElementById('installMdl').classList.remove('on');toast('✅ تم تثبيت التطبيق!')});
+function doInstall(){
+  localStorage.setItem('sch_installed','1');
+  document.getElementById('installMdl').classList.remove('on');
+  if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(function(r){if(r.outcome==='accepted')toast('✅ تم التثبيت!');deferredPrompt=null})}
+  else alert('لتثبيت التطبيق:\nChrome: ⋮ ← تثبيت التطبيق\nSafari: مشاركة ← إضافة للشاشة الرئيسية');
+}
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(function(){});
+
+// ===== INIT =====
+window.onload=function(){
+  // إظهار مودال التثبيت أول مرة
+  if(!localStorage.getItem('sch_installed')){
+    setTimeout(function(){document.getElementById('installMdl').classList.add('on')},1000);
+  }
+  // Nav
+  document.getElementById('nb0').addEventListener('click',function(){showTab(0)});
+  document.getElementById('nb1').addEventListener('click',function(){showTab(1)});
+  document.getElementById('nb2').addEventListener('click',function(){showTab(2)});
+  document.getElementById('nb3').addEventListener('click',function(){showTab(3)});
+  // Header
+  document.getElementById('btnImport').addEventListener('click',function(){document.getElementById('importMdl').classList.add('on')});
+  document.getElementById('btnAlerts').addEventListener('click',function(){showAlertsModal()});
+  document.getElementById('btnInstall').addEventListener('click',function(){doInstall()});
+  // Fab
+  document.getElementById('fabAdd').addEventListener('click',function(){openAdd()});
+  // Add/Edit Modal
+  document.getElementById('closeAddMdl').addEventListener('click',function(){document.getElementById('addMdl').classList.remove('on')});
+  document.getElementById('cancelAddBtn').addEventListener('click',function(){document.getElementById('addMdl').classList.remove('on')});
+  document.getElementById('addMdl').addEventListener('click',function(e){if(e.target===this)this.classList.remove('on')});
+  document.getElementById('saveLecBtn').addEventListener('click',function(){saveLec()});
+  document.getElementById('delLecBtn').addEventListener('click',function(){delLec()});
+  document.getElementById('rTheory').addEventListener('click',function(){setType('نظري')});
+  document.getElementById('rPrac').addEventListener('click',function(){setType('عملي')});
+  document.getElementById('rPending').addEventListener('click',function(){setStatus('pending')});
+  document.getElementById('rDone').addEventListener('click',function(){setStatus('done')});
+  document.getElementById('rCancel').addEventListener('click',function(){setStatus('cancel')});
+  document.getElementById('rPostpone').addEventListener('click',function(){setStatus('postpone')});
+  // Filters
+  document.getElementById('mainSearch').addEventListener('input',function(){render()});
+  document.getElementById('fYear').addEventListener('change',function(){render()});
+  document.getElementById('fDept').addEventListener('change',function(){render()});
+  document.getElementById('fDay').addEventListener('change',function(){render()});
+  document.getElementById('fType').addEventListener('change',function(){render()});
+  // Doctor Modal
+  document.getElementById('closeDocMdl').addEventListener('click',function(){document.getElementById('docMdl').classList.remove('on')});
+  document.getElementById('docMdl').addEventListener('click',function(e){if(e.target===this)this.classList.remove('on')});
+  // Conflict Modal
+  document.getElementById('closeConflictMdl').addEventListener('click',function(){document.getElementById('conflictMdl').classList.remove('on')});
+  document.getElementById('conflictMdl').addEventListener('click',function(e){if(e.target===this)this.classList.remove('on')});
+  // Backup
+  document.getElementById('expBtn').addEventListener('click',function(){expBackup()});
+  document.getElementById('impBtnLbl').addEventListener('click',function(){document.getElementById('impFile').click()});
+  document.getElementById('impFile').addEventListener('change',function(){impBackup(this)});
+  document.getElementById('csvBtn').addEventListener('click',function(){expCSV()});
+  document.getElementById('sampleBtn').addEventListener('click',function(){loadSample()});
+  // Import Modal
+  document.getElementById('closeImportMdl').addEventListener('click',function(){document.getElementById('importMdl').classList.remove('on')});
+  document.getElementById('importMdl').addEventListener('click',function(e){if(e.target===this)this.classList.remove('on')});
+  document.getElementById('itImg').addEventListener('click',function(){setImportType('img')});
+  document.getElementById('itFile').addEventListener('click',function(){setImportType('file')});
+  document.getElementById('itText').addEventListener('click',function(){setImportType('text')});
+  document.getElementById('imgDropArea').addEventListener('click',function(){pickImgFile()});
+  document.getElementById('fileDropArea').addEventListener('click',function(){pickOfficeFile()});
+  document.getElementById('doImportBtn').addEventListener('click',function(){doImport()});
+  document.getElementById('saveAllImportBtn').addEventListener('click',function(){saveAllImport()});
+  var savedKey=localStorage.getItem('sch_apikey');
+  if(savedKey)document.getElementById('apiKeyInp').value=savedKey;
+  // Alerts Modal
+  document.getElementById('closeAlertsMdl').addEventListener('click',function(){document.getElementById('alertsMdl').classList.remove('on')});
+  document.getElementById('alertsMdl').addEventListener('click',function(e){if(e.target===this)this.classList.remove('on')});
+  document.getElementById('enableAlertsBtn').addEventListener('click',function(){enableAlerts()});
+  // Install Modal
+  document.getElementById('doInstallBtn').addEventListener('click',function(){doInstall()});
+  document.getElementById('laterInstallBtn').addEventListener('click',function(){localStorage.setItem('sch_installed','1');document.getElementById('installMdl').classList.remove('on')});
+  // Render
+  render();
+};
+</script>
+</body>
+</html>
